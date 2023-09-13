@@ -37,6 +37,7 @@ class _ExpensesState extends State<Expenses> {
 
   void _openAddExpenseOverlay() {
     showModalBottomSheet(
+      useSafeArea: true,
       isScrollControlled: true,
       context: context,
       builder: (ctx) => NewExpense(onAddExpense: _addExpense),
@@ -59,17 +60,22 @@ class _ExpensesState extends State<Expenses> {
       SnackBar(
         duration: const Duration(seconds: 3),
         content: const Text('Expense Deleted!'),
-        action: SnackBarAction(label: 'Undo', onPressed: () {
-          setState(() {
-            _registeredExpenses.insert(expenseIndex, expense);
-          });
-        }),
+        action: SnackBarAction(
+            label: 'Undo',
+            onPressed: () {
+              setState(() {
+                _registeredExpenses.insert(expenseIndex, expense);
+              });
+            }),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width; 
+    //print(MediaQuery.of(context).size.height); 
+
     Widget mainContent = const Center(
       child: Text('No expenses found. Start adding some!'),
     );
@@ -91,10 +97,15 @@ class _ExpensesState extends State<Expenses> {
           ),
         ],
       ),
-      body: Column(children: [
-        Chart(expenses: _registeredExpenses),
-        Expanded(child: mainContent),
-      ]),
+      body: width <600 ? Column(
+        children: [
+          Chart(expenses: _registeredExpenses),
+          Expanded(child: mainContent),
+        ],
+      ) : Row(children: [
+        Expanded(child: Chart(expenses: _registeredExpenses)),
+          Expanded(child: mainContent),
+      ],)
     );
   }
 }
